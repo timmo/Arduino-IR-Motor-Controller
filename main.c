@@ -1,6 +1,6 @@
 
 #include <Arduino.h>
-#include <IRremote-min.h>
+#include <IRremote.h>
 
 // Arduino Pins
 const int RECV_PIN = 11;

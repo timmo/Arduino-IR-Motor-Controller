@@ -3,10 +3,10 @@
 
 BOARD_TAG    = attiny85
 MCU = attiny85
-F_CPU = 8MHz
-ALTERNATE_CORE = tiny8
+F_CPU = 8000000
+#ALTERNATE_CORE = tiny8
 ALTERNATE_CORE_PATH = /Applications/Arduino.app/Contents/Resources/Java/hardware/attiny
-ARDUINO_VAR_PATH = /Applications/Arduino.app/Contents/Resources/Java/hardware/attiny/variants
+ARDUINO_VAR_PATH = /Applications/Arduino.app/Contents/Resources/Java/hardware/attiny/variants/tiny8
 
 ARDUINO_LIBS = IRremote
 

@@ -1,12 +1,13 @@
+
 #include <IRremote.h>
-#include <IRremoteInt.h>
 #include <stdlib.h>
 
 // Arduino Pins
+const int ENGINE_FORWARD_PIN = 0; // OC0A
+const int ENGINE_BACKWARD_PIN = 1; // OC0B
 const int RECV_PIN = 2;
-const int ENGINE_FORWARD_PIN = 0;
-const int ENGINE_BACKWARD_PIN = 1;
-const int LIGHT_PIN = 3;
+const int LIGHT_PIN = 3; // OC1B
+const int ENGINE_SPEED_PIN = 4;
 
 // Remote Key Values
 const unsigned long KEY_PLAY_PAUSE = 0x77E12084;
@@ -35,11 +36,13 @@ int engineOutputPinLevel = 0;
 int engineRoute = 0; // -1, 1
 
 void setup() {
-//  Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
-  
+
   pinMode(ENGINE_FORWARD_PIN, OUTPUT);
   pinMode(ENGINE_BACKWARD_PIN, OUTPUT);
+  pinMode(ENGINE_SPEED_PIN, OUTPUT);
+  pinMode(LIGHT_PIN, OUTPUT);
+  pinMode(RECV_PIN, INPUT);
 }
 
 void loop() {
@@ -53,19 +56,19 @@ void loop() {
 
     switch(key) {
     case KEY_PLAY_PAUSE:
-//      Serial.println("KEY_PLAY_PAUSE");
+      //      Serial.println("KEY_PLAY_PAUSE");
       enginePace = 0;
       break;
     case KEY_FORWARD:
-//      Serial.println("KEY_FORWARD");
+      //      Serial.println("KEY_FORWARD");
       enginePace < MAX_VELOCITY ? enginePace++ : enginePace;
       break;
     case KEY_BACKWARD:
-//      Serial.println("KEY_BACKWARD");
+      //      Serial.println("KEY_BACKWARD");
       enginePace > -MAX_VELOCITY ? enginePace-- : enginePace;
       break;
     case KEY_MENU:
-//      Serial.println("KEY_MENU");
+      //      Serial.println("KEY_MENU");
       light = !light;
       break;
     }
@@ -74,30 +77,27 @@ void loop() {
     engineRoute = enginePace >> 7;
     engineOutputPinLevel = (MAX_OUTPUT_LEVEL * engineVelocity ) / MAX_VELOCITY;
 
-    int  forwardLevel = (1+engineRoute) * engineOutputPinLevel;
-    int backwardLevel = -1 * engineRoute * engineOutputPinLevel;   
-    analogWrite(ENGINE_FORWARD_PIN, forwardLevel ); 
-    analogWrite(ENGINE_BACKWARD_PIN, backwardLevel); 
+    analogWrite(ENGINE_SPEED_PIN, engineOutputPinLevel);
+    if (enginePace >= 0) {
+      digitalWrite(ENGINE_FORWARD_PIN, HIGH);
+      digitalWrite(ENGINE_BACKWARD_PIN, LOW);
+    }
+    else {
+      digitalWrite(ENGINE_FORWARD_PIN, LOW);
+      digitalWrite(ENGINE_BACKWARD_PIN, HIGH);
+    }
 
-    //    Serial.print("enginePace: "); 
-    //    Serial.println(enginePace);
-    //    Serial.print("engineVelocity: "); 
-    //    Serial.println(engineVelocity);
-    //    Serial.print("engineRoute: "); 
-    //    Serial.println(engineRoute);    
-    //    Serial.print("forwardLevel: "); 
-    //    Serial.println(forwardLevel);
-    //    Serial.print("backwardLevel: "); 
-    //    Serial.println(backwardLevel);
-    //    Serial.println("\n");
-
-    analogWrite(LIGHT_PIN, 255 * light);
+    digitalWrite(LIGHT_PIN, light);
 
     lastKey = key;
     irrecv.resume(); // Receive the next value
   }
 
 }
+
+
+
+
 
 
 
